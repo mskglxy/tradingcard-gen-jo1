@@ -1,0 +1,696 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>JO1 トレカ交換ツイート メーカー</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: linear-gradient(180deg, #EAF7FB, #D6EEF6);
+    color: #33415C;
+    font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
+  }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 24px 16px 60px; }
+  header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+  .logo {
+    width: 52px; height: 52px; border-radius: 40%; flex-shrink: 0;
+    background: linear-gradient(135deg, #FF9EB5 0%, #BCE6F2 55%, #5FBCD9 100%);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; box-shadow: 0 8px 20px rgba(255,158,181,0.3);
+  }
+  h1 { font-size: 22px; margin: 0; font-weight: 900; }
+  h1 .grad { background: linear-gradient(90deg, #FF9EB5, #8FCFE0, #5FBCD9); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .sub { font-size: 13px; color: rgba(51,65,92,0.5); margin: 2px 0 0; }
+  .grid { display: grid; grid-template-columns: 1fr; gap: 24px; }
+  @media (min-width: 960px) { .grid { grid-template-columns: 420px 1fr; } }
+  .card { background: #fff; border: 1px solid rgba(95,188,217,0.3); border-radius: 14px; padding: 16px; margin-bottom: 16px; }
+  .field { margin-bottom: 12px; }
+  .field:last-child { margin-bottom: 0; }
+  .field label { display: block; font-size: 12px; color: rgba(51,65,92,0.7); margin-bottom: 6px; }
+  input[type=text], input[type=number], textarea, select {
+    width: 100%; background: #F3FAFC; border: 1px solid rgba(95,188,217,0.25);
+    border-radius: 8px; padding: 9px 10px; font-size: 13px; color: #33415C; font-family: inherit;
+  }
+  textarea { resize: none; }
+  .hint { font-size: 11px; color: rgba(51,65,92,0.4); margin: 6px 0 0; }
+  .row { display: flex; gap: 8px; align-items: center; }
+  .row.between { justify-content: space-between; }
+  .btn {
+    border: 1px solid rgba(95,188,217,0.3); background: #F3FAFC; color: #33415C;
+    border-radius: 8px; padding: 8px 12px; font-size: 12px; cursor: pointer; font-family: inherit;
+  }
+  .btn.primary { background: #5FBCD9; border-color: #5FBCD9; color: #fff; font-weight: 600; }
+  .btn.dark { background: #33415C; border-color: #33415C; color: #fff; font-weight: 600; }
+  .btn.small { padding: 6px 10px; font-size: 11px; }
+  .btn.active-pink { background: #FF9EB5; border-color: #FF9EB5; color: #fff; font-weight: 600; }
+  .btn.active-mint { background: #5FD3B4; border-color: #5FD3B4; color: #fff; font-weight: 600; }
+  .chip { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; padding: 5px 8px 5px 10px; border-radius: 999px; background: #F3FAFC; border: 1px solid rgba(95,188,217,0.3); }
+  .chip button { border: none; background: none; cursor: pointer; color: rgba(51,65,92,0.5); font-size: 11px; padding: 0; }
+  .chip button:hover { color: #FF6F91; }
+  .tag-row { border: 1px solid rgba(95,188,217,0.2); border-radius: 8px; padding: 10px; margin-bottom: 8px; }
+  .tag-row:last-child { margin-bottom: 0; }
+  .grid-btns { display: flex; flex-wrap: wrap; gap: 6px; max-height: 150px; overflow-y: auto; margin-top: 8px; }
+  .num-btn { font-size: 11px; padding: 6px 8px; min-width: 34px; border-radius: 6px; border: none; cursor: pointer; }
+  .item-group-title { font-size: 12px; color: rgba(51,65,92,0.7); display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+  canvas { width: 100%; height: auto; display: block; border-radius: 16px; }
+  .canvas-wrap { border: 1px solid rgba(95,188,217,0.3); border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px rgba(95,188,217,0.1); margin-bottom: 16px; }
+  .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 6px; }
+  pre#tweetPreview { white-space: pre-wrap; font-size: 13px; background: #fff; border: 1px solid rgba(95,188,217,0.25); border-radius: 8px; padding: 14px; line-height: 1.6; font-family: inherit; margin: 0; }
+  .item-list-row { background: #fff; border: 1px solid rgba(95,188,217,0.2); border-radius: 8px; padding: 8px 10px; margin-top: 8px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo">✨</div>
+    <div>
+      <h1><span class="grad">JO1トレカ交換</span> <span style="color:#FF9EB5">♡</span></h1>
+      <p class="sub">メンバーを選んで番号ボタンを押すとリストに追加されます</p>
+    </div>
+  </header>
+
+  <div class="grid">
+    <div>
+      <div class="card">
+        <div class="field">
+          <label>公演名（任意・ツイート文の先頭に入ります）</label>
+          <input type="text" id="liveName" placeholder="例）5th Anniversary Live" />
+        </div>
+        <div class="field">
+          <label>対象番号レンジ（任意）</label>
+          <div class="row">
+            <input type="number" id="numStart" placeholder="開始" />
+            <span>〜</span>
+            <input type="number" id="numEnd" placeholder="終了" />
+          </div>
+          <p class="hint">設定すると下の番号ボタンから選べるようになります</p>
+        </div>
+        <div class="field">
+          <label>特殊カードタグ（任意）</label>
+          <div id="specialTagsList"></div>
+          <div class="row" style="margin-top:8px;">
+            <input type="text" id="newSpecialTag" placeholder="例）+7000円トレカ" />
+            <button class="btn primary" id="addSpecialTagBtn">追加</button>
+          </div>
+          <p class="hint">チェックを入れたタグは、譲/求の画面に専用の番号ボタンとして表示されます</p>
+        </div>
+        <div class="field">
+          <label>特殊設定・自由記述（任意）</label>
+          <textarea id="specialNote" rows="2" placeholder="例）初版のみ／サイン入り不可 など"></textarea>
+        </div>
+      </div>
+
+      <div class="item-group" id="giveGroupShell"></div>
+      <div class="item-group" id="wantGroupShell"></div>
+
+      <div class="card">
+        <div class="field">
+          <label>交換方法（任意・押すと文面に入ります）</label>
+          <div class="row" id="dealMethodBtns"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="field">
+          <label>ひとこと（任意）</label>
+          <div class="row" id="phraseBtns" style="flex-wrap:wrap; margin-bottom:8px;"></div>
+          <textarea id="note" rows="2" placeholder="全通希望/即日対応など自由に"></textarea>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="field">
+          <label>ハッシュタグ</label>
+          <div class="row" id="hashtagBtns"></div>
+        </div>
+      </div>
+
+      <button class="btn" id="rerollSerialBtn" style="margin-top:4px;">↻ シリアル番号を振り直す</button>
+    </div>
+
+    <div>
+      <div class="canvas-wrap"><canvas id="cardCanvas"></canvas></div>
+      <div class="btn-grid">
+        <button class="btn primary" id="downloadBtn">⬇ 画像を保存</button>
+        <button class="btn dark" id="tweetBtn">↗ Xでツイート</button>
+      </div>
+      <p class="hint" style="margin:0 0 16px;">Xの投稿画面には文章のみ入ります。画像は保存してから投稿画面に添付してください</p>
+      <div class="row between" style="margin-bottom:8px;">
+        <span style="font-size:12px; color:rgba(51,65,92,0.5);">ツイート文プレビュー</span>
+        <button class="btn small" id="copyBtn">📋 コピー</button>
+      </div>
+      <pre id="tweetPreview"></pre>
+    </div>
+  </div>
+</div>
+
+<script>
+// ---------- constants ----------
+const MEMBERS = ["與那城奨","川尻蓮","白岩瑠姫","河野純喜","佐藤景瑚","川西拓実","木全翔也","金城碧海","豆原一成"];
+const SURNAME = {
+  "與那城奨":"與那城","川尻蓮":"川尻","白岩瑠姫":"白岩","河野純喜":"河野","佐藤景瑚":"佐藤",
+  "川西拓実":"川西","木全翔也":"木全","金城碧海":"金城","豆原一成":"豆原",
+};
+const ANY_LABEL = "なんでも";
+const SPECIAL_SEP = "\u0001";
+const PHRASE_OPTIONS = ["n(当方):1も可能", "セルカ⇔セルカ", "異種交換可"];
+const HASHTAG_OPTIONS = ["#JO1交換"];
+const MAX_GRID = 150;
+
+function genSerial(){ return "JO1-" + Math.floor(Math.random()*90000+10000); }
+function encodeSpecial(tag,num){ return SPECIAL_SEP+tag+SPECIAL_SEP+num; }
+function isSpecialToken(v){ return typeof v === "string" && v.startsWith(SPECIAL_SEP); }
+function decodeSpecial(v){ const p=v.split(SPECIAL_SEP); return {tag:p[1], number:p[2]}; }
+function shortTagLabel(tag){ return tag.replace(/^\+/,"").replace(/トレカ$/,""); }
+function displayValue(v){
+  if (v === ANY_LABEL) return ANY_LABEL;
+  if (isSpecialToken(v)) { const {tag,number} = decodeSpecial(v); return number+"("+shortTagLabel(tag)+")"; }
+  return v;
+}
+function sortValues(arr){
+  const nums = arr.filter(v => v!==ANY_LABEL && !isSpecialToken(v) && !isNaN(Number(v)) && v!=="").sort((a,b)=>Number(a)-Number(b));
+  const others = arr.filter(v => v===ANY_LABEL || isSpecialToken(v) || isNaN(Number(v)) || v==="");
+  return [...nums, ...others];
+}
+function parseNumberList(text){
+  return (text||"").split(",").map(s=>s.trim()).filter(Boolean)
+    .filter((v,i,arr)=>arr.indexOf(v)===i)
+    .sort((a,b)=>{ const na=Number(a), nb=Number(b); if(!isNaN(na)&&!isNaN(nb)) return na-nb; return a.localeCompare(b); });
+}
+function escapeHtml(s){
+  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+// ---------- state ----------
+const S = {
+  liveName: "JO1DER SHOW 2026 'EIEN 永縁'FINAL",
+  numStart: "147",
+  numEnd: "158",
+  giveItems: [],
+  wantItems: [],
+  giveMember: MEMBERS[0],
+  wantMember: MEMBERS[0],
+  giveOtherOpen: false,
+  wantOtherOpen: false,
+  dealMethod: "",
+  note: "",
+  specialNote: "",
+  specialTags: [{ id:"t1", name:"+7000円トレカ", enabled:true, numbersText:"" }],
+  tags: ["#JO1交換"],
+  serial: genSerial(),
+};
+
+function toggleValue(list, member, value){
+  const idx = list.findIndex(it => it.member === member);
+  if (idx === -1){ list.push({ id: Math.random().toString(36).slice(2), member, numbers:[value] }); return; }
+  const entry = list[idx];
+  let numbers;
+  if (entry.numbers.includes(value)) numbers = entry.numbers.filter(x=>x!==value);
+  else if (value === ANY_LABEL) numbers = [ANY_LABEL];
+  else numbers = sortValues([...entry.numbers.filter(x=>x!==ANY_LABEL), value]);
+  if (numbers.length===0) list.splice(idx,1);
+  else entry.numbers = numbers;
+}
+function removeNumber(list, id, val){
+  const idx = list.findIndex(it=>it.id===id);
+  if (idx===-1) return;
+  const numbers = list[idx].numbers.filter(x=>x!==val);
+  if (numbers.length===0) list.splice(idx,1);
+  else list[idx].numbers = numbers;
+}
+function removeEntry(list, id){
+  const idx = list.findIndex(it=>it.id===id);
+  if (idx>=0) list.splice(idx,1);
+}
+function outOfRange(n){
+  if (n==="" || S.numStart==="" || S.numEnd==="") return false;
+  const v=Number(n), s=Number(S.numStart), e=Number(S.numEnd);
+  return v<s || v>e;
+}
+function lineFor(it){
+  const name = SURNAME[it.member] || it.member;
+  if (it.numbers.includes(ANY_LABEL)) return name + ANY_LABEL;
+  return name + " " + sortValues(it.numbers).map(displayValue).join(",");
+}
+
+// ---------- tweet text ----------
+function buildTweetText(){
+  const lines = [];
+  if (S.liveName) lines.push(S.liveName);
+  lines.push("トレカ交換", "");
+  lines.push("【譲】");
+  (S.giveItems.length ? S.giveItems : [null]).forEach(it => lines.push(it ? lineFor(it) : "（未設定）"));
+  lines.push("", "【求】");
+  (S.wantItems.length ? S.wantItems : [null]).forEach(it => lines.push(it ? lineFor(it) : "（未設定）"));
+  if (S.dealMethod) lines.push("", "交換方法: " + S.dealMethod);
+  if (S.specialNote) lines.push("", S.specialNote);
+  if (S.note) lines.push("", S.note);
+  lines.push("", S.tags.join(" "));
+  return lines.join("\n");
+}
+
+// ---------- canvas drawing ----------
+function roundRect(ctx,x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r);
+  ctx.closePath();
+}
+function wrapText(ctx,text,x,y,maxWidth,lineHeight,maxLines){
+  const parts = text.split(",");
+  let line="", lines=0, curY=y;
+  for (let i=0;i<parts.length;i++){
+    const sep = line ? "," : "";
+    const test = line + sep + parts[i];
+    if (ctx.measureText(test).width > maxWidth && line !== ""){
+      ctx.fillText(line,x,curY);
+      line = parts[i]; curY += lineHeight; lines++;
+      if (lines >= maxLines-1 && i < parts.length-1){
+        const rest = parts.slice(i+1).join(",");
+        const truncated = line + "," + rest;
+        ctx.fillText(truncated.length>22 ? truncated.slice(0,22)+"…" : truncated, x, curY);
+        return;
+      }
+    } else line = test;
+  }
+  ctx.fillText(line,x,curY);
+}
+
+function drawCanvas(){
+  const canvas = document.getElementById("cardCanvas");
+  const gRows = Math.max(S.giveItems.length, 1);
+  const wRows = Math.max(S.wantItems.length, 1);
+  const rows = Math.max(gRows, wRows);
+  const rowH = 90;
+  const panelH = 120 + rows*rowH;
+  const headerH = (S.liveName || (S.numStart!=="" && S.numEnd!=="")) ? 190 : 150;
+  const W = 1200, H = headerH + panelH + 100;
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext("2d");
+
+  const BG_TOP="#EAF7FB", BG_BOTTOM="#D6EEF6", PANEL_BG="#FFFFFF";
+  const TEXT_MAIN="#33415C", TEXT_SUB="rgba(51,65,92,0.55)";
+  const ACCENT="#5FBCD9", PINK="#FF9EB5", MINT="#5FD3B4";
+
+  const bgGrad = ctx.createLinearGradient(0,0,W,H);
+  bgGrad.addColorStop(0,BG_TOP); bgGrad.addColorStop(1,BG_BOTTOM);
+  ctx.fillStyle = bgGrad; ctx.fillRect(0,0,W,H);
+
+  ctx.save(); ctx.globalAlpha=0.5; ctx.fillStyle="#FFFFFF";
+  [[W*0.85,H*0.12,60],[W*0.92,H*0.22,30],[W*0.1,H*0.85,40]].forEach(([cx,cy,r])=>{
+    ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fill();
+  });
+  ctx.restore();
+
+  const stubW = 190;
+  ctx.save(); ctx.beginPath(); ctx.rect(0,0,stubW,H); ctx.clip();
+  ctx.fillStyle="rgba(95,188,217,0.12)"; ctx.fillRect(0,0,stubW,H); ctx.restore();
+
+  ctx.save(); ctx.strokeStyle="rgba(95,188,217,0.55)"; ctx.lineWidth=3; ctx.setLineDash([10,10]);
+  ctx.beginPath(); ctx.moveTo(stubW,0); ctx.lineTo(stubW,H); ctx.stroke(); ctx.restore();
+
+  ctx.fillStyle=BG_TOP;
+  [0,H].forEach(y=>{ ctx.beginPath(); ctx.arc(stubW,y,22,0,Math.PI*2); ctx.fill(); });
+
+  ctx.strokeStyle=ACCENT; ctx.lineWidth=4; roundRect(ctx,10,10,W-20,H-20,24); ctx.stroke();
+
+  ctx.save(); ctx.translate(stubW/2+8, H/2); ctx.rotate(-Math.PI/2);
+  ctx.fillStyle=ACCENT; ctx.font="700 22px sans-serif"; ctx.textAlign="center"; ctx.textBaseline="middle";
+  ctx.fillText("♡ CARD TRADE ♡",0,0); ctx.restore();
+
+  ctx.save(); ctx.translate(60, H-40); ctx.rotate(-Math.PI/2);
+  ctx.fillStyle=TEXT_SUB; ctx.font="400 17px monospace"; ctx.textAlign="left";
+  ctx.fillText(S.serial,0,0); ctx.restore();
+
+  const left = stubW+60, right = W-60;
+
+  const badgeGrad = ctx.createLinearGradient(left,0,left+108,0);
+  badgeGrad.addColorStop(0,PINK); badgeGrad.addColorStop(1,ACCENT);
+  ctx.fillStyle=badgeGrad; roundRect(ctx,left,30,108,36+8,18); ctx.fill();
+  ctx.fillStyle="#FFFFFF"; ctx.font="800 22px sans-serif"; ctx.textAlign="center";
+  ctx.fillText("JO1", left+54, 59);
+  ctx.textAlign="left"; ctx.fillStyle=TEXT_MAIN; ctx.font="800 30px sans-serif";
+  ctx.fillText("トレカ交換", left+124, 62);
+  ctx.fillStyle=PINK; ctx.font="16px sans-serif";
+  ctx.fillText("✦", left+124+ctx.measureText("トレカ交換").width+12, 42);
+  ctx.fillStyle=MINT; ctx.font="13px sans-serif";
+  ctx.fillText("✦", left+124+ctx.measureText("トレカ交換").width+30, 60);
+
+  let subY = 100;
+  if (S.liveName){
+    ctx.fillStyle=ACCENT; ctx.font="700 20px sans-serif";
+    ctx.fillText("♪ "+S.liveName, left, subY); subY += 30;
+  }
+  if (S.numStart!=="" && S.numEnd!==""){
+    ctx.fillStyle=TEXT_SUB; ctx.font="500 18px sans-serif";
+    ctx.fillText("対象番号  "+S.numStart+" 〜 "+S.numEnd, left, subY); subY += 26;
+  }
+  if (S.dealMethod){
+    ctx.fillStyle=TEXT_SUB; ctx.font="500 16px sans-serif";
+    ctx.fillText("交換方法: "+S.dealMethod, left, subY); subY += 8;
+  }
+
+  ctx.strokeStyle="rgba(95,188,217,0.4)"; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(left,subY+18); ctx.lineTo(right,subY+18); ctx.stroke();
+
+  const colW = (right-left-40)/2;
+  const cardY = subY+46;
+
+  function panel(x,label,items,accent){
+    ctx.save();
+    ctx.fillStyle=PANEL_BG; ctx.shadowColor="rgba(95,188,217,0.25)"; ctx.shadowBlur=18; ctx.shadowOffsetY=6;
+    roundRect(ctx,x,cardY,colW,panelH,20); ctx.fill();
+    ctx.shadowColor="transparent"; ctx.strokeStyle=accent; ctx.lineWidth=2.5;
+    roundRect(ctx,x,cardY,colW,panelH,20); ctx.stroke();
+
+    ctx.fillStyle=accent; roundRect(ctx,x+24,cardY+22,108,36,18); ctx.fill();
+    ctx.fillStyle="#FFFFFF"; ctx.font="700 18px sans-serif"; ctx.textAlign="center";
+    ctx.fillText(label, x+24+54, cardY+46); ctx.textAlign="left";
+
+    const display = items.length ? items : [{member:"未設定", numbers:[]}];
+    display.forEach((it,i)=>{
+      const rowY = cardY+100+i*rowH;
+      ctx.fillStyle=TEXT_MAIN; ctx.font="700 24px sans-serif";
+      ctx.fillText(it.member, x+24, rowY);
+      ctx.fillStyle=accent; ctx.font="600 19px monospace";
+      const numsText = it.numbers && it.numbers.length ? (it.numbers.includes(ANY_LABEL) ? ANY_LABEL : sortValues(it.numbers).map(displayValue).join(",")) : "--";
+      wrapText(ctx,numsText,x+24,rowY+30,colW-48,24,2);
+      if (i < display.length-1){
+        ctx.strokeStyle="rgba(51,65,92,0.1)"; ctx.lineWidth=1;
+        ctx.beginPath(); ctx.moveTo(x+20,rowY+66); ctx.lineTo(x+colW-20,rowY+66); ctx.stroke();
+      }
+    });
+    ctx.restore();
+  }
+
+  panel(left, "【譲】", S.giveItems, PINK);
+  panel(left+colW+40, "【求】", S.wantItems, MINT);
+
+  ctx.fillStyle=ACCENT; ctx.font="600 20px monospace";
+  ctx.fillText(S.tags.join("  "), left, H-40);
+  ctx.textAlign="right"; ctx.fillStyle="rgba(51,65,92,0.35)"; ctx.font="400 16px monospace";
+  ctx.fillText("FAN-MADE / NOT OFFICIAL", right, H-40);
+  ctx.textAlign="left";
+}
+
+// ---------- rendering: settings tags list ----------
+function renderSpecialTagsList(){
+  const el = document.getElementById("specialTagsList");
+  el.innerHTML = S.specialTags.map(t => `
+    <div class="tag-row" data-tag-id="${t.id}">
+      <div class="row between">
+        <label class="row" style="cursor:pointer; font-size:13px;">
+          <input type="checkbox" data-action="toggleTagEnabled" data-id="${t.id}" ${t.enabled ? "checked" : ""} style="accent-color:#5FBCD9;" />
+          <span style="font-weight:600; margin-left:6px;">${escapeHtml(t.name)}</span>
+        </label>
+        <button class="btn small" data-action="removeSpecialTag" data-id="${t.id}">✕</button>
+      </div>
+      ${t.enabled ? `<input type="text" data-action="tagNumbersText" data-id="${t.id}" value="${escapeHtml(t.numbersText)}" placeholder="番号をカンマ区切りで（例：3,17,42,88）" style="margin-top:8px;" />` : ""}
+    </div>
+  `).join("");
+}
+
+// ---------- rendering: item groups ----------
+function renderGroupShell(key){
+  const isWant = key === "want";
+  const shell = document.getElementById(isWant ? "wantGroupShell" : "giveGroupShell");
+  const accentVar = isWant ? "mint" : "pink";
+  const title = isWant ? "求めるトレカ" : "譲るトレカ";
+  const dotColor = isWant ? "#5FD3B4" : "#FF9EB5";
+  shell.innerHTML = `
+    <div class="item-group-title"><span class="dot" style="background:${dotColor}"></span>${title}</div>
+    <div class="card">
+      <select data-action="setMember" data-group="${key}">
+        ${MEMBERS.map(m => `<option value="${m}" ${S[key+"Member"]===m ? "selected":""}>${m}</option>`).join("")}
+      </select>
+      ${isWant ? `<button class="btn" style="width:100%; margin-top:10px;" data-action="toggleAny" data-group="${key}" id="anyBtn-${key}">なんでもでOK</button>` : ""}
+      <div style="margin-top:10px;">
+        <button class="btn" style="width:100%;" data-action="toggleOtherOpen" data-group="${key}" id="otherToggleBtn-${key}">その他</button>
+        <div id="otherInputWrap-${key}" style="display:${S[key+"OtherOpen"] ? "flex":"none"}; gap:8px; margin-top:8px;">
+          <input type="text" id="otherText-${key}" placeholder="自由に記載（例：状態は問いません）" />
+          <button class="btn primary small" data-action="addOther" data-group="${key}">追加</button>
+        </div>
+      </div>
+      <div id="tagsArea-${key}" style="margin-top:10px;"></div>
+      <div id="numberGrid-${key}" style="margin-top:10px;"></div>
+      <p class="hint" id="rangeHint-${key}"></p>
+    </div>
+    <div id="itemList-${key}"></div>
+  `;
+  updateGroup(key);
+}
+
+function updateGroup(key){
+  const isWant = key === "want";
+  const items = S[key+"Items"];
+  const currentMember = S[key+"Member"];
+  const accent = isWant ? "#5FD3B4" : "#FF9EB5";
+  const accentClass = isWant ? "active-mint" : "active-pink";
+  const currentEntry = items.find(it => it.member === currentMember);
+
+  // any button state
+  if (isWant){
+    const anyBtn = document.getElementById("anyBtn-want");
+    const isAny = currentEntry ? currentEntry.numbers.includes(ANY_LABEL) : false;
+    anyBtn.className = "btn" + (isAny ? " " + accentClass : "");
+  }
+
+  // その他 toggle button visual + input visibility
+  const otherBtn = document.getElementById("otherToggleBtn-"+key);
+  otherBtn.className = "btn" + (S[key+"OtherOpen"] ? " " + accentClass : "");
+  document.getElementById("otherInputWrap-"+key).style.display = S[key+"OtherOpen"] ? "flex" : "none";
+
+  // special tags area
+  const tagsArea = document.getElementById("tagsArea-"+key);
+  const enabledTags = S.specialTags.filter(t=>t.enabled);
+  tagsArea.innerHTML = enabledTags.map(t => {
+    const nums = parseNumberList(t.numbersText);
+    const btns = nums.length ? nums.map(n => {
+      const sel = currentEntry ? currentEntry.numbers.includes(encodeSpecial(t.name,n)) : false;
+      return `<button class="btn num-btn ${sel ? accentClass : ""}" data-action="toggleTagNumber" data-group="${key}" data-tag="${escapeHtml(t.name)}" data-num="${escapeHtml(n)}">${escapeHtml(n)}</button>`;
+    }).join("") : `<p class="hint">設定でこのタグの番号をカンマ区切りで入れるとボタンで選べます</p>`;
+    return `<div class="tag-row"><span style="font-size:12px; font-weight:600;">${escapeHtml(t.name)}</span><div class="grid-btns">${btns}</div></div>`;
+  }).join("");
+
+  // main number grid
+  const s = Number(S.numStart), e = Number(S.numEnd);
+  const hasRange = S.numStart!=="" && S.numEnd!=="" && !isNaN(s) && !isNaN(e) && e>=s;
+  const gridCount = hasRange ? e-s+1 : 0;
+  const showGrid = hasRange && gridCount>0 && gridCount<=MAX_GRID;
+  const numberGrid = document.getElementById("numberGrid-"+key);
+  const rangeHint = document.getElementById("rangeHint-"+key);
+  if (showGrid){
+    let html = '<div class="grid-btns">';
+    for (let n=s; n<=e; n++){
+      const sel = currentEntry ? currentEntry.numbers.includes(String(n)) : false;
+      html += `<button class="btn num-btn ${sel ? accentClass : ""}" data-action="toggleNumber" data-group="${key}" data-num="${n}">${n}</button>`;
+    }
+    html += '</div>';
+    numberGrid.innerHTML = html;
+    rangeHint.textContent = "";
+  } else {
+    numberGrid.innerHTML = `
+      <div class="row">
+        <input type="number" id="manualNum-${key}" placeholder="番号を入力（例：23）" />
+        <button class="btn small" style="background:${accent}; color:#fff; border-color:${accent};" data-action="addManualNumber" data-group="${key}">追加</button>
+      </div>`;
+    rangeHint.textContent = hasRange ? "" : "上の「対象番号レンジ」を設定するとボタンで選べます";
+  }
+
+  // item list
+  const itemList = document.getElementById("itemList-"+key);
+  itemList.innerHTML = items.map(it => `
+    <div class="item-list-row">
+      <div class="row between" style="margin-bottom:6px;">
+        <span style="font-size:12px; font-weight:600; color:${accent};">${escapeHtml(it.member)}</span>
+        <button class="btn small" data-action="removeEntry" data-group="${key}" data-id="${it.id}">🗑</button>
+      </div>
+      <div>
+        ${sortValues(it.numbers).map(n => `
+          <span class="chip">${escapeHtml(displayValue(n))}<button data-action="removeNumber" data-group="${key}" data-id="${it.id}" data-val="${escapeHtml(n)}">✕</button></span>
+        `).join(" ")}
+      </div>
+    </div>
+  `).join("");
+}
+
+// ---------- deal method / phrase / hashtag buttons ----------
+function renderDealMethodBtns(){
+  const el = document.getElementById("dealMethodBtns");
+  el.innerHTML = ["郵送希望","手渡し希望"].map(m => `
+    <button class="btn ${S.dealMethod===m ? "primary" : ""}" data-action="setDealMethod" data-val="${m}">${m}</button>
+  `).join("");
+}
+function renderPhraseBtns(){
+  const el = document.getElementById("phraseBtns");
+  el.innerHTML = PHRASE_OPTIONS.map(p => `<button class="btn small" data-action="addPhrase" data-val="${escapeHtml(p)}">+ ${escapeHtml(p)}</button>`).join("");
+}
+function renderHashtagBtns(){
+  const el = document.getElementById("hashtagBtns");
+  el.innerHTML = HASHTAG_OPTIONS.map(tag => `
+    <button class="btn ${S.tags.includes(tag) ? "primary" : ""}" data-action="toggleHashtag" data-val="${tag}">${tag}</button>
+  `).join("");
+}
+
+// ---------- full refresh of derived views ----------
+function refresh(){
+  updateGroup("give");
+  updateGroup("want");
+  renderDealMethodBtns();
+  renderHashtagBtns();
+  document.getElementById("tweetPreview").textContent = buildTweetText();
+  drawCanvas();
+}
+
+// ---------- event delegation ----------
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest("[data-action]");
+  if (!btn) return;
+  const action = btn.dataset.action;
+  const group = btn.dataset.group;
+
+  if (action === "toggleTagEnabled"){
+    const t = S.specialTags.find(x=>x.id===btn.dataset.id);
+    if (t) t.enabled = !t.enabled;
+    renderSpecialTagsList(); refresh(); return;
+  }
+  if (action === "removeSpecialTag"){
+    S.specialTags = S.specialTags.filter(x=>x.id!==btn.dataset.id);
+    renderSpecialTagsList(); refresh(); return;
+  }
+  if (action === "toggleAny"){
+    toggleValue(S[group+"Items"], S[group+"Member"], ANY_LABEL);
+    refresh(); return;
+  }
+  if (action === "toggleOtherOpen"){
+    S[group+"OtherOpen"] = !S[group+"OtherOpen"];
+    updateGroup(group); return;
+  }
+  if (action === "addOther"){
+    const input = document.getElementById("otherText-"+group);
+    const t = input.value.trim();
+    if (t){ toggleValue(S[group+"Items"], S[group+"Member"], t); input.value=""; refresh(); }
+    return;
+  }
+  if (action === "toggleTagNumber"){
+    toggleValue(S[group+"Items"], S[group+"Member"], encodeSpecial(btn.dataset.tag, btn.dataset.num));
+    refresh(); return;
+  }
+  if (action === "toggleNumber"){
+    toggleValue(S[group+"Items"], S[group+"Member"], btn.dataset.num);
+    refresh(); return;
+  }
+  if (action === "addManualNumber"){
+    const input = document.getElementById("manualNum-"+group);
+    const v = input.value.trim();
+    if (v){ toggleValue(S[group+"Items"], S[group+"Member"], v); input.value=""; refresh(); }
+    return;
+  }
+  if (action === "removeEntry"){
+    removeEntry(S[group+"Items"], btn.dataset.id);
+    refresh(); return;
+  }
+  if (action === "removeNumber"){
+    removeNumber(S[group+"Items"], btn.dataset.id, btn.dataset.val);
+    refresh(); return;
+  }
+  if (action === "setDealMethod"){
+    S.dealMethod = (S.dealMethod === btn.dataset.val) ? "" : btn.dataset.val;
+    refresh(); return;
+  }
+  if (action === "addPhrase"){
+    S.note = S.note ? (S.note + "\n" + btn.dataset.val) : btn.dataset.val;
+    document.getElementById("note").value = S.note;
+    refresh(); return;
+  }
+  if (action === "toggleHashtag"){
+    const tag = btn.dataset.val;
+    S.tags = S.tags.includes(tag) ? S.tags.filter(t=>t!==tag) : [...S.tags, tag];
+    refresh(); return;
+  }
+});
+
+document.addEventListener("change", (e) => {
+  if (e.target.dataset && e.target.dataset.action === "setMember"){
+    const group = e.target.dataset.group;
+    S[group+"Member"] = e.target.value;
+    updateGroup(group);
+  }
+  if (e.target.dataset && e.target.dataset.action === "tagNumbersText"){
+    const t = S.specialTags.find(x=>x.id===e.target.dataset.id);
+    if (t) t.numbers_pending = e.target.value;
+  }
+});
+
+document.addEventListener("input", (e) => {
+  const el = e.target;
+  if (el.id === "liveName"){ S.liveName = el.value; document.getElementById("tweetPreview").textContent = buildTweetText(); drawCanvas(); return; }
+  if (el.id === "numStart"){ S.numStart = el.value; updateGroup("give"); updateGroup("want"); document.getElementById("tweetPreview").textContent = buildTweetText(); drawCanvas(); return; }
+  if (el.id === "numEnd"){ S.numEnd = el.value; updateGroup("give"); updateGroup("want"); document.getElementById("tweetPreview").textContent = buildTweetText(); drawCanvas(); return; }
+  if (el.id === "note"){ S.note = el.value; document.getElementById("tweetPreview").textContent = buildTweetText(); return; }
+  if (el.id === "specialNote"){ S.specialNote = el.value; document.getElementById("tweetPreview").textContent = buildTweetText(); return; }
+  if (el.dataset && el.dataset.action === "tagNumbersText"){
+    const t = S.specialTags.find(x=>x.id===el.dataset.id);
+    if (t){ t.numbersText = el.value; updateGroup("give"); updateGroup("want"); document.getElementById("tweetPreview").textContent = buildTweetText(); drawCanvas(); }
+    return;
+  }
+});
+
+document.getElementById("addSpecialTagBtn").addEventListener("click", () => {
+  const input = document.getElementById("newSpecialTag");
+  const t = input.value.trim();
+  if (!t || S.specialTags.some(x=>x.name===t)) return;
+  S.specialTags.push({ id: Math.random().toString(36).slice(2), name:t, enabled:true, numbersText:"" });
+  input.value = "";
+  renderSpecialTagsList();
+  refresh();
+});
+document.getElementById("newSpecialTag").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") document.getElementById("addSpecialTagBtn").click();
+});
+
+document.getElementById("rerollSerialBtn").addEventListener("click", () => {
+  S.serial = genSerial();
+  drawCanvas();
+});
+
+document.getElementById("downloadBtn").addEventListener("click", () => {
+  const canvas = document.getElementById("cardCanvas");
+  const url = canvas.toDataURL("image/png");
+  const a = document.createElement("a");
+  a.href = url; a.download = S.serial + ".png"; a.click();
+});
+
+document.getElementById("tweetBtn").addEventListener("click", () => {
+  const url = "https://twitter.com/intent/tweet?text=" + encodeURIComponent(buildTweetText());
+  window.open(url, "_blank", "noopener,noreferrer");
+});
+
+document.getElementById("copyBtn").addEventListener("click", async () => {
+  try {
+    await navigator.clipboard.writeText(buildTweetText());
+    const btn = document.getElementById("copyBtn");
+    const original = btn.textContent;
+    btn.textContent = "✓ コピーしました";
+    setTimeout(()=>{ btn.textContent = original; }, 1600);
+  } catch(err) {}
+});
+
+// ---------- init ----------
+document.getElementById("liveName").value = S.liveName;
+document.getElementById("numStart").value = S.numStart;
+document.getElementById("numEnd").value = S.numEnd;
+renderSpecialTagsList();
+renderGroupShell("give");
+renderGroupShell("want");
+renderPhraseBtns();
+refresh();
+</script>
+</body>
+</html>
